@@ -1,13 +1,10 @@
-#Frontier.get_tbd_url() blocks until a URL is
-# permissible, so each Worker just fetches, scrapes, and queues new links.
-
 from threading import Thread
 import time
 from inspect import getsource
 
 from utils.download import download
 from utils import get_logger
-import scraper  # your scraper.py module
+import scraper  # scraper.py module
 
 
 class Worker(Thread):
@@ -26,7 +23,7 @@ class Worker(Thread):
         self.config = config
         self.frontier = frontier
 
-        # Enforce: scraper.py must *not* import high‑level HTTP libs directly
+        # scraper.py must not import high‑level HTTP libs directly
         disallowed = {
             "from requests import", "import requests",
             "from urllib.request import", "import urllib.request",
@@ -35,11 +32,7 @@ class Worker(Thread):
             "Do not use requests / urllib in scraper.py; use utils.download." )
 
         super().__init__(daemon=True)
-
-    # ------------------------------------------------------------------
     #  Main fetch–process loop
-    # ------------------------------------------------------------------
-
     def run(self):
         while True:
             url = self.frontier.get_tbd_url()
@@ -60,5 +53,5 @@ class Worker(Thread):
             # Mark this URL as processed
             self.frontier.mark_url_complete(url)
 
-            # Optional global throttle (still respects per‑domain politeness)
+            # global throttle 
             time.sleep(self.config.time_delay)

@@ -3,13 +3,9 @@ import os
 import re
 from collections import Counter, defaultdict
 from urllib.parse import urldefrag, urljoin, urlparse
-
 from bs4 import BeautifulSoup
 
-# ---------------------------------------------------------------------------
 # Globals & constants
-# ---------------------------------------------------------------------------
-
 ASSIGNMENT_DOMAINS = {
     "ics.uci.edu",
     "cs.uci.edu",
@@ -19,10 +15,10 @@ ASSIGNMENT_DOMAINS = {
 TODAY_PATH_PREFIX = "/department/information_computer_sciences"
 
 # A URL is considered unique by (scheme, netloc, path, params, query) –
-# fragments are discarded via urldefrag() **before** adding to this set.
+# fragments are discarded via urldefrag() before adding to this set
 unique_urls: set[str] = set()
 
-# Mapping URL → word‑count (after stop‑word removal)
+# Mapping URL  word‑count (after stop‑word removal)
 page_word_counts: dict[str, int] = {}
 
 # Global unigram frequency across all pages
@@ -31,7 +27,7 @@ word_frequencies: Counter[str] = Counter()
 # Sub‑domain page counts (for anything ending in .uci.edu)
 subdomain_counts: defaultdict[str, int] = defaultdict(int)
 
-# Load English stop‑words once
+# Load stop‑words once
 _STOPWORDS_PATH = os.path.join(os.path.dirname(__file__), "stopwords.txt")
 try:
     with open(_STOPWORDS_PATH, "r", encoding="utf-8") as fp:
@@ -42,9 +38,7 @@ except FileNotFoundError:
 # Ensure log directory exists
 os.makedirs("Logs", exist_ok=True)
 
-# ---------------------------------------------------------------------------
-#  Scraper entry – called by Worker
-# ---------------------------------------------------------------------------
+#  Scraper entry called by Worker
 
 def scraper(url: str, resp):
     """Process *resp* fetched from *url* and return outlinks to crawl."""
@@ -56,10 +50,7 @@ def scraper(url: str, resp):
     links = extract_next_links(url, resp)
     return [link for link in links if is_valid(link)]
 
-
-# ---------------------------------------------------------------------------
 #  Helper – extract hyperlinks
-# ---------------------------------------------------------------------------
 
 def extract_next_links(url: str, resp):
     """Return a list of absolute, defragmented URLs extracted from *resp*."""
@@ -85,10 +76,7 @@ def extract_next_links(url: str, resp):
 
     return outlinks
 
-
-# ---------------------------------------------------------------------------
 #  URL filtering policy (domains + trap heuristics)
-# ---------------------------------------------------------------------------
 
 def is_valid(url: str) -> bool:
     """Return *True* if this URL should be enqueued for crawling."""
@@ -98,7 +86,7 @@ def is_valid(url: str) -> bool:
         if parsed.scheme not in {"http", "https"}:
             return False
 
-        # 2. Disallow fragments & "junk" queries early (but keep useful queries)
+        # 2. Disallow fragments & "junk" queries early
         if len(parsed.query) > 50:
             # super‑long queries are usually trackers or dynamic traps
             return False
@@ -114,7 +102,7 @@ def is_valid(url: str) -> bool:
             # today.uci.edu special path restriction
             if host == "today.uci.edu":
                 return parsed.path.startswith(TODAY_PATH_PREFIX)
-            # Accept if the registered domain exactly matches assignment list
+            # Accept if the registered domain exactly matches list
             return any(host.endswith(domain) for domain in ASSIGNMENT_DOMAINS)
         return False
 
@@ -122,10 +110,7 @@ def is_valid(url: str) -> bool:
         print(f"⚠️ is_valid error on {url}: {exc}")
         return False
 
-
-# ---------------------------------------------------------------------------
 #  Page processing & analytics helpers
-# ---------------------------------------------------------------------------
 
 def _is_html(resp) -> bool:
     content_type = resp.raw_response.headers.get("Content-Type", "").lower()
@@ -161,10 +146,7 @@ def _process_page(url: str, resp):
     except Exception as exc:
         print(f"⚠️ _process_page error on {url}: {exc}")
 
-
-# ---------------------------------------------------------------------------
 #  Exit hook – write report.txt once crawler terminates
-# ---------------------------------------------------------------------------
 
 def _write_report():
     os.makedirs("Logs", exist_ok=True)
@@ -194,10 +176,7 @@ def _write_report():
 
 
 atexit.register(_write_report)
-
-# ---------------------------------------------------------------------------
 #  Regex helpers
-# ---------------------------------------------------------------------------
 
 _BINARY_EXTENSIONS = re.compile(
     r".*\.(css|js|bmp|gif|jpe?g|ico|png|tiff?|mid|mp2|mp3|mp4|wav|avi|mov|"

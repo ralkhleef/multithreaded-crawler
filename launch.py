@@ -1,7 +1,3 @@
-# Adds graceful Ctrl‑C handling and fixes the multiprocessing
-# start‑method on macOS/Linux. scraper.py writes the final
-# analytics report automatically via its atexit hook.
-
 import multiprocessing
 multiprocessing.set_start_method("fork", force=True)  # required on macOS
 
