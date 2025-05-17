@@ -1,0 +1,14 @@
+ICS Web Crawler – Assignment 2 Report
+============================================================
+
+1) Unique pages count: 0
+
+2) Longest page by word‑count:
+   
+   0 words after stop‑word removal
+
+3) 50 most common words (after stop‑word removal):
+
+4) Sub‑domains within uci.edu (alphabetical):
+
+-- End of report --
