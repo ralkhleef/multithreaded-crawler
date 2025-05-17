@@ -1,7 +1,3 @@
-# Replaces the stock Frontier and supports **exactly** the requirements of
-# ICS 161 A2: – three workers, ≥500 ms between requests to the *same domain*,
-# resumable disk‑based frontier via shelve, and seed‑URL bootstrapping.
-
 import os
 import shelve
 import time
@@ -46,10 +42,7 @@ class Frontier:
                 self._enqueue_seed(seed)
         else:
             self._resume_from_save()
-
-    # ------------------------------------------------------------------
     #  Public API used by Worker threads
-    # ------------------------------------------------------------------
 
     def get_tbd_url(self) -> str | None:
         """Return the next crawlable URL that respects politeness.
@@ -62,7 +55,7 @@ class Frontier:
                 if not self.to_be_downloaded:
                     return None
 
-                url = self.to_be_downloaded.pop()  # LIFO gives depth‑first
+                url = self.to_be_downloaded.pop()  # LIFO
                 domain = urlparse(url).netloc
                 wait = POLITENESS_DELAY - (time.time() - self._domain_last[domain])
 
@@ -74,7 +67,7 @@ class Frontier:
                 # Politeness not satisfied – push back and fall through
                 self.to_be_downloaded.appendleft(url)
 
-            # Sleep *outside* the lock so other threads may progress
+            # Sleep so other threads may progress
             time.sleep(wait)
 
     def add_url(self, url: str):
@@ -98,10 +91,7 @@ class Frontier:
             else:
                 self.logger.error(f"Completed URL {url} not present in DB.")
 
-    # ------------------------------------------------------------------
     #  Internal helpers
-    # ------------------------------------------------------------------
-
     def _enqueue_seed(self, url: str):
         url = normalize(url)
         if not is_valid(url):
@@ -121,10 +111,7 @@ class Frontier:
                 resumed += 1
         self.logger.info(f"Resumed {resumed} pending URLs from {total} stored.")
 
-    # ------------------------------------------------------------------
     #  Clean‑up (optional)
-    # ------------------------------------------------------------------
-
     def __del__(self):
         try:
             self._db.close()
