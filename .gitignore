@@ -109,3 +109,4 @@ venv.bak/
 *.full.py
 *.shelve.ipynb_checkpoints/
 partial_indexes/
+.nfs*
