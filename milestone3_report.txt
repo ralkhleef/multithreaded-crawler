@@ -1,0 +1,7 @@
+For this part of the project, I tested my search engine using 20 different queries. I picked 10 that I expected to work well, like “machine learning,” “cristina lopes,” “software engineering,” and “graduate program.” These worked correctly and gave useful results fast, showing that the ranking and search were working as planned.
+
+The other 10 queries were ones that did not work well at first. Some of these were “privacy policy,” “faculty research,” “natural language processing,” “open source,” and “student resources.” They either gave bad results or the search was too slow.
+
+To fix this, I changed the search code so that it does not load everything into memory. Instead, it only loads the parts needed for each search. This helped reduce memory use and stopped the program from crashing. I also made sure the search used correct term frequencies and document frequencies. I used a word stemmer to make sure that words in the query matched the ones in the index.
+
+These changes helped the poor queries work better while keeping the good ones the same. Now the search engine uses less memory and responds quickly.
